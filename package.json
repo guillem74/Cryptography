@@ -9,6 +9,7 @@
   "author": "Guillem Muñoz",
   "license": "ISC",
   "dependencies": {
-    "big-integer": "^1.6.26"
+    "big-integer": "^1.6.26",
+    "express": "^4.16.2"
   }
 }
