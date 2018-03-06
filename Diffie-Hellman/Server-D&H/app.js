@@ -59,7 +59,7 @@
 
 		console.log("Decrypted message: ", mDecrypted)
 
-		res.status(200).send("ok")
+		res.status(200).send("Correct");
 
 
 	});
