@@ -81,6 +81,8 @@ typings/
 .idea/**/gradle.xml
 .idea/**/libraries
 
+node_modules/
+
 # CMake
 cmake-build-debug/
 
