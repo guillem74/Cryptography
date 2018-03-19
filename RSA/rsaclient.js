@@ -20,7 +20,6 @@ request({
             let e = bignum(r.e);
             let n = bignum(r.n);
             console.log(e);
-            console.log(n);
 
         }
 
