@@ -17,22 +17,32 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/a', function(req,res){
+const bits = bignum(16);
+
+p = bignum(2).pow(bits.sub(1)).rand(bignum(2).pow(bits)).nextPrime();
+q = bignum(2).pow(bits.sub(1)).rand(bignum(2).pow(bits)).nextPrime();
+
+n = p.mul(q);
+phi = (p.sub(1)).mul((q.sub(1)));
+e = bignum(65537);
+d = e.invertm(phi);
+
+app.get('/public', function(req,res){
+
     var response = {};
-    const bits = bignum(16);
-
-    p = bignum(2).pow(bits.sub(1)).rand(bignum(2).pow(bits)).nextPrime();
-    q = bignum(2).pow(bits.sub(1)).rand(bignum(2).pow(bits)).nextPrime();
-
-    n = p.mul(q);
-    phi = (p.sub(1)).mul((q.sub(1)));
-    e = bignum(65537);
-    console.log(e);
-    console.log(n);
     response.e = e.toString();
     response.n = n.toString();
     res.status(200).send(response);
 });
+
+app.post('/message', function(req, res){
+    let c = bignum(req.body.c);
+    res.status(200).send("Correct");
+    let m = c.powm(d, n);
+    console.log(m);
+});
+
+
 
 app.listen(3000);
 console.log("Listening on port 3000");
