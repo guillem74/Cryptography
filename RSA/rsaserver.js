@@ -26,8 +26,9 @@ n = p.mul(q);
 phi = (p.sub(1)).mul((q.sub(1)));
 e = bignum(65537);
 d = e.invertm(phi);
+m = bignum(4444);
 
-app.get('/public', function(req,res){
+app.get('/encrypt', function(req,res){
 
     var response = {};
     response.e = e.toString();
@@ -35,14 +36,30 @@ app.get('/public', function(req,res){
     res.status(200).send(response);
 });
 
-app.post('/message', function(req, res){
+app.post('/decrypt', function(req, res){
     let c = bignum(req.body.c);
     res.status(200).send("Correct");
     let m = c.powm(d, n);
     console.log(m);
 });
 
+app.get('/sign', function(req,res){
 
+    var response = {};
+    let s = m.powm(d, n);
+    response.s = s.toString();
+    response.e = e.toString();
+    response.n = n.toString();
+    console.log(s);
+    res.status(200).send(response);
+});
+
+app.post('/verify', function(req, res){
+    let message = bignum(req.body.m);
+    console.log(message);
+    console.log(m);
+    res.status(200).send("Correct");
+});
 
 app.listen(3000);
 console.log("Listening on port 3000");
