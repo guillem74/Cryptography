@@ -1,3 +1,5 @@
+'use strict';
+
 const bignum = require('bignum');
 const express = require('express');
 const path = require('path');
@@ -5,7 +7,7 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
-var app = express();
+const app = express();
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -17,20 +19,21 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const bits = bignum(16);
+const p = bignum.prime(1024, true);
+const q = bignum.prime(1024, true);
 
-p = bignum(2).pow(bits.sub(1)).rand(bignum(2).pow(bits)).nextPrime();
-q = bignum(2).pow(bits.sub(1)).rand(bignum(2).pow(bits)).nextPrime();
+const n = p.mul(q);
+const phi = (p.sub(1)).mul(q.sub(1));
+const e = bignum(65537);
+const d = e.invertm(phi);
 
-n = p.mul(q);
-phi = (p.sub(1)).mul((q.sub(1)));
-e = bignum(65537);
-d = e.invertm(phi);
-m = bignum(4444);
+const msg = "Estamos firmando y verificando";
+const buff = Buffer.from(msg);
+const m = bignum.fromBuffer(buff);
 
 app.get('/encrypt', function(req,res){
 
-    var response = {};
+    let response = {};
     response.e = e.toString();
     response.n = n.toString();
     res.status(200).send(response);
@@ -40,24 +43,37 @@ app.post('/decrypt', function(req, res){
     let c = bignum(req.body.c);
     res.status(200).send("Correct");
     let m = c.powm(d, n);
-    console.log(m);
+    const msg = m.toBuffer().toString();
+    console.log(msg);
 });
 
 app.get('/sign', function(req,res){
 
-    var response = {};
+    let response = {};
     let s = m.powm(d, n);
     response.s = s.toString();
     response.e = e.toString();
     response.n = n.toString();
-    console.log(s);
     res.status(200).send(response);
 });
 
 app.post('/verify', function(req, res){
-    let message = bignum(req.body.m);
+    let message = req.body.m;
     console.log(message);
-    console.log(m);
+    console.log(msg);
+    res.status(200).send("Correct");
+});
+
+app.get('/publicKeys', function(req,res){
+    let response = {};
+    response.e = e.toString();
+    response.n = n.toString();
+    res.status(200).send(response);
+});
+
+app.post('/blindSignature', function(req,res){
+    let message = req.body.m;
+    console.log(message);
     res.status(200).send("Correct");
 });
 
