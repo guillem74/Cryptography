@@ -1,3 +1,4 @@
+
 'use strict';
 
 const request = require('request');
@@ -24,17 +25,11 @@ request({
             const e = bignum(res.e);
             const n = bignum(res.n);
 
-            let r = n.rand();
-            while (r.gcd(n)!=1){
-                r= n.rand();
-            }
-            const m2 = r.powm(e,n);
-            const mPrime = m.mul(m2);
-
             let message = {};
-            message.m = mPrime.toString();
+            message.m = msg;
+
             request({
-                url: 'http://localhost:3000/blindSignature',
+                url: 'http://localhost:3000/sign',
                 method: 'POST',
                 body: message,
                 json: true
@@ -42,7 +37,13 @@ request({
                 if (error)
                     console.log("POST error");
                 else {
-                    console.log(body)
+                    console.log(body);
+                    console.log(body.m);
+                    const s = bignum(body.m);
+                    const m = s.powm(e, n);
+                    const msg2 = m.toBuffer().toString();
+                    console.log(msg2);
+                    console.log(msg);
 
                 }
             });
