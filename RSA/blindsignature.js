@@ -43,6 +43,7 @@ request({
                     console.log("POST error");
                 else {
                     console.log(body)
+                    const res = JSON.parse(body)
 
                 }
             });

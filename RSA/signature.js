@@ -26,7 +26,7 @@ request({
             const n = bignum(res.n);
 
             let message = {};
-            message.m = msg;
+            message.m = buff;
 
             request({
                 url: 'http://localhost:3000/sign',
@@ -37,9 +37,8 @@ request({
                 if (error)
                     console.log("POST error");
                 else {
-                    console.log(body);
-                    console.log(body.m);
                     const s = bignum(body.m);
+                    console.log(s);
                     const m = s.powm(e, n);
                     const msg2 = m.toBuffer().toString();
                     console.log(msg2);
