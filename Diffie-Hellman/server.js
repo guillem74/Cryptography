@@ -8,20 +8,9 @@ const bodyParser = require('body-parser');
 const bigInt = require ('big-integer');
 const crypto = require ('crypto');
 
+const dh = require('./dh');
+
 const app = express();
-
-let p = bigInt(4);
-const g = bigInt(2);
-const bits = bigInt(16);
-
-while (!p.isPrime()){
-
-	p = bigInt.randBetween(bigInt(2).pow(bits.minus(1)), bigInt(2).pow(bits).minus(1))
-}
-
-const a = bigInt(bigInt.randBetween(2, p.minus(1)));
-
-const A = bigInt(g.modPow(a,p));
 
 
 app.set('views', path.join(__dirname, 'views'));
@@ -33,15 +22,11 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
+const parameters = dh.AliceParameters();
+
 app.get('/key', function (req,res){
 
-	let response= {};
-
-	response.p=p;
-	response.g=g;
-	response.A=A;
-
-	res.status(200).send(response)
+	res.status(200).send(parameters)
 
 });
 
@@ -52,7 +37,7 @@ app.post('/message', function(req, res){
 	let mDecrypted;
 
 	//Generate the key
-	const key = bigInt(B.modPow(a,p));
+	const key = dh.dhKeyAlice(B, parameters.a, parameters.p);
 	const iv = req.body.iv;
 
 	//Decrypt message

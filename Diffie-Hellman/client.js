@@ -1,6 +1,7 @@
     const request = require('request');
     const bigInt = require ('big-integer');
     const crypto = require ('crypto');
+    const dh = require ('./dh')
 
     const text = "Diffie-Hellman negotiation";
 
@@ -23,11 +24,10 @@
                 const g = bigInt(r.g);
                 const A = bigInt(r.A);
 
-                const b = bigInt(bigInt.randBetween(2, p.minus(1)));
-                const B = bigInt(g.modPow(b,p));
+                const parameters = dh.BobParameters(p, g);
 
-                //Generate key
-                const key = bigInt(A.modPow(b,p));
+                const key = dh.dhKeyBob(A, parameters.b, parameters.p);
+
 
                 const iv = crypto.randomBytes(16);
 
@@ -38,7 +38,7 @@
 
                 let  message = {};
                 message.message = encrypted;
-                message.B = B;
+                message.B = parameters.B;
                 message.iv = iv;
 
                 request({
