@@ -20,6 +20,8 @@ request({
         if (error)
             console.log("GET error");
         else{
+
+            //Obtain public parameters
             const res = JSON.parse(body);
             const e = bignum(res.e);
             const n = bignum(res.n);
@@ -28,9 +30,14 @@ request({
             while (r.gcd(n)!=1){
                 r= n.rand();
             }
+            //Compute m2 = r^e mod(n)
             const m2 = r.powm(e,n);
-            const mPrime = m.mul(m2);
+            //Compute m' = m * m2
+            const mPrime = m.mul(m2).mod(n);
+            //Invert r for later
+            const rInv = r.invertm(n);
 
+            //Send m'
             let message = {};
             message.m = mPrime.toString();
             request({
@@ -42,8 +49,13 @@ request({
                 if (error)
                     console.log("POST error");
                 else {
-                    console.log(body)
-                    const res = JSON.parse(body)
+                    const res = bignum(body.s);
+                    //Compute sigma = sigma' * r^-1 * mod(n)
+                    const sigma = (res.mul(rInv)).mod(n);
+                    // Compute sigma^e mod (n)
+                    const deNum = sigma.powm(e, n);
+                    const de = deNum.toBuffer().toString();
+                    console.log(de);
 
                 }
             });
