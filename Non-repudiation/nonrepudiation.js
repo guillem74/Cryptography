@@ -1,7 +1,7 @@
 'use strict';
 
 const bignum = require ('bignum');
-const bcrypt = require ('bcrypt');
+const crypto = require('crypto');
 
 /*
 Non-repudiation protocol with an unreliable channel and
@@ -15,33 +15,42 @@ Proof of publication of K: Pkp = [H(TTP, A, B, K)] from TTP
 where A and B are origin and destination nodes, and TTP is an intermediary
  */
 
-const proofOrigin = function (A, B, C, kPrivate){
-    /*
-    We apply a hash function to A, B and C
-    Finally, the hash is signed with A's private key
-     */
-    const buff = Buffer.concat([A, B, C]);
-    const hash = bcrypt.hashSync(buff, 10);
+const proofOfOrigin = function (alice, bob, message, privateKey){
+
+    const a = new Array(alice, bob, message);
+    const concat = a.join(',');
+    const hash = crypto.createHash('sha256').update(concat).digest('hex');
+
 };
 
-const proofReception = function(B, A, C, kPrivate){
-    /*
-    We apply a hash function to B, A and C
-    Afterwards, the hash is signed with B's private key
-     */
-    const buff = Buffer.concat([B, A, C]);
-    const hash = bcrypt.hashSync(buff, 10);
+const proofOfReception = function(alice, bob, message, privateKey){
+
+    const a = new Array(bob, alice, message);
+    const concat = a.join(',');
+    const hash = crypto.createHash('sha256').update(concat).digest('hex');
+
 };
 
-const proofOriginK = function(A, TTP, B, K, kPrivate){
+const proofOfOriginK = function(alice, ttp, bob, message, k, privateKey){
 
-    const buff = Buffer.concat([A, TTP, B, K]);
-    const hash = bcrypt.hashSync(buff, 10);
+    const a = new Array(alice, ttp, bob, k);
+    const concat = a.join(',');
+    const hash = crypto.createHash('sha256').update(concat).digest('hex');
+
 };
 
-const proofPublicationK = function(TTP, A, B, K, kPrivate){
+const proofOfPublicationK = function(alice, ttp, bob, message, k, privateKey){
 
-    const buff = Buffer.concat([TTP, A, B, K]);
-    const hash = bcrypt.hashSync(buff, 10);
+    const a = new Array(ttp, alice, bob, k);
+    const concat = a.join(',');
+    const hash = crypto.createHash('sha256').update(concat).digest('hex');
+};
+
+module.exports = {
+    proofOfOrigin: proofOfOrigin,
+    proofOfReception: proofOfReception,
+    proofOfOriginK: proofOfOriginK,
+    proofOfPublicationK: proofOfPublicationK
+
 };
 
