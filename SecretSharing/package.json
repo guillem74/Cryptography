@@ -1,0 +1,15 @@
+{
+  "name": "secretsharing",
+  "version": "1.0.0",
+  "description": "",
+  "main": "secretsharing.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^2.0.1",
+    "bignum": "^0.12.5"
+  }
+}
