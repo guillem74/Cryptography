@@ -2,7 +2,7 @@
 
 const bignum = require ('bignum');
 const crypto = require('crypto');
-
+const rsa = require('../RSA/rsa');
 /*
 Non-repudiation protocol with an unreliable channel and
 non-honest identities consists in:
@@ -15,42 +15,20 @@ Proof of publication of K: Pkp = [H(TTP, A, B, K)] from TTP
 where A and B are origin and destination nodes, and TTP is an intermediary
  */
 
-const proofOfOrigin = function (alice, bob, message, privateKey){
+const {publicKey, privateKey} = rsa.generateRandomKeys(512);
 
-    const a = new Array(alice, bob, message);
-    const concat = a.join(',');
-    const hash = crypto.createHash('sha256').update(concat).digest('hex');
 
+const proof = function (array){
+
+    const hash = crypto.createHash('sha256').update(array).digest('hex');
+    const bn = bignum(hash);
+    const signed = privateKey.sign(bn);
+    console.log(signed)
 };
 
-const proofOfReception = function(alice, bob, message, privateKey){
-
-    const a = new Array(bob, alice, message);
-    const concat = a.join(',');
-    const hash = crypto.createHash('sha256').update(concat).digest('hex');
-
-};
-
-const proofOfOriginK = function(alice, ttp, bob, message, k, privateKey){
-
-    const a = new Array(alice, ttp, bob, k);
-    const concat = a.join(',');
-    const hash = crypto.createHash('sha256').update(concat).digest('hex');
-
-};
-
-const proofOfPublicationK = function(alice, ttp, bob, message, k, privateKey){
-
-    const a = new Array(ttp, alice, bob, k);
-    const concat = a.join(',');
-    const hash = crypto.createHash('sha256').update(concat).digest('hex');
-};
 
 module.exports = {
-    proofOfOrigin: proofOfOrigin,
-    proofOfReception: proofOfReception,
-    proofOfOriginK: proofOfOriginK,
-    proofOfPublicationK: proofOfPublicationK
+    proof: proof
 
 };
 

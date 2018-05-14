@@ -2,13 +2,13 @@
 
 const nr = require('./nonrepudiation');
 
+
+
 const a = "A"
 const b = "B"
 const c = "C"
-const d = "D"
-const e = Buffer.from('a', 'utf8');
 
+const array = new Array(a, b, c);
+const concat = array.join(',');
 
-
-
-nr.proof(a, b, c, d);
+nr.proof(concat);
