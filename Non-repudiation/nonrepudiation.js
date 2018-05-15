@@ -27,9 +27,17 @@ const proof = function (array, key){
     return signed;
 };
 
+const check = function (array){
+    const hash = crypto.createHash('sha256').update(array).digest('hex');
+    const buff = Buffer.from(hash);
+    const bn = bignum.fromBuffer(buff);
+    return bn;
+};
+
 
 module.exports = {
-    proof: proof
+    proof: proof,
+    check: check
 
 };
 
