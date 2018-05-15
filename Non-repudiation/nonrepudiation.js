@@ -15,15 +15,16 @@ Proof of publication of K: Pkp = [H(TTP, A, B, K)] from TTP
 where A and B are origin and destination nodes, and TTP is an intermediary
  */
 
-const {publicKey, privateKey} = rsa.generateRandomKeys(512);
 
 
-const proof = function (array){
+const proof = function (array, key){
 
     const hash = crypto.createHash('sha256').update(array).digest('hex');
-    const bn = bignum(hash);
-    const signed = privateKey.sign(bn);
-    console.log(signed)
+    const buff = Buffer.from(hash);
+    const bn = bignum.fromBuffer(buff);
+    const privateK = rsa.privateKey(key);
+    const signed = privateK.sign(bn);
+    return signed;
 };
 
 
