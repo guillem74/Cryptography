@@ -19,7 +19,8 @@ where A and B are origin and destination nodes, and TTP is an intermediary
 
 const proof = function (array, key){
 
-    const hash = crypto.createHash('sha256').update(array).digest('hex');
+    const concat = array.join(',');
+    const hash = crypto.createHash('sha256').update(concat).digest('hex');
     const buff = Buffer.from(hash);
     const bn = bignum.fromBuffer(buff);
     const privateK = rsa.privateKey(key);
@@ -28,7 +29,9 @@ const proof = function (array, key){
 };
 
 const check = function (array){
-    const hash = crypto.createHash('sha256').update(array).digest('hex');
+
+    const concat = array.join(',');
+    const hash = crypto.createHash('sha256').update(concat).digest('hex');
     const buff = Buffer.from(hash);
     const bn = bignum.fromBuffer(buff);
     return bn;

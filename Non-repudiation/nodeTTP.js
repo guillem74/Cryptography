@@ -37,18 +37,17 @@ app.post('/proofOfPubK', function(req, res){
     const pko = bignum(req.body.pko, 16);
     console.log(k);
 
+
     const pubKeyA = rsa.publicKey(req.body.pubkey);
     const hash = pubKeyA.verify(pko);
     console.log(hash);
 
-    const array = new Array(a, ttp, b, k);
-    const concat = array.join(',');
-    const hashCheck = nr.check(concat);
+    const array = [a, ttp, b, k];
+    const hashCheck = nr.check(array);
     console.log(hashCheck);
 
-    const array2 = new Array(ttp, a, b, k);
-    const concat2 = array2.join(',');
-    const pkp = nr.proof(concat2, privateKey);
+    const array2 = [ttp, a, b, k];
+    const pkp = nr.proof(array2, privateKey);
     let message = {};
     message.ttp = ttp;
     message.a = a;

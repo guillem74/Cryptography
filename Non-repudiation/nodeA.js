@@ -4,9 +4,9 @@ const request = require('request');
 const bignum = require('bignum');
 const rsa = require('../RSA/rsa');
 const nr = require('./nonrepudiation');
-const crypto = require ('crypto');
+const crypto = require('crypto');
 
-const { publicKey, privateKey } = rsa.generateRandomKeys(512);
+const {publicKey, privateKey} = rsa.generateRandomKeys(512);
 
 
 const a = "A";
@@ -20,9 +20,8 @@ let c = cipher.update(m, 'utf8', 'hex');
 c += cipher.final('hex');
 
 
-const array = new Array(a, b, c);
-const concat = array.join(',');
-const signed = nr.proof(concat, privateKey);
+const array = [a, b, c];
+const signed = nr.proof(array, privateKey);
 let message = {};
 message.a = a;
 message.b = b;
@@ -35,10 +34,10 @@ request({
     method: 'POST',
     body: message,
     json: true
-}, function(error, response, body){
+}, function (error, response, body) {
     if (error)
         console.log("POST error");
-    else{
+    else {
         const pr = bignum(body.pr, 16);
         const a = body.a;
         const b = body.b;
@@ -46,31 +45,29 @@ request({
         const hash = pubKeyB.verify(pr);
         console.log(hash);
 
-        const array = new Array(b, a, c);
-        const concat = array.join(',');
-        const hashCheck = nr.check(concat);
+        const array = [a, b, c];
+        const hashCheck = nr.check(array);
         console.log(hashCheck);
 
-        const pko = new Array(a, ttp, b, k);
-        const concatPko = pko.join(',');
-        const signed = nr.proof(concatPko, privateKey);
-        let message = {};
-        message.a = a;
-        message.ttp = ttp;
-        message.b = b;
-        message.k = k;
-        message.pko = signed;
-        message.pubkey = publicKey;
-
+        const pko = [a, ttp, b, k];
+        const signed = nr.proof(pko, privateKey);
+        let message = {
+            a : body.a,
+            ttp : ttp,
+            b : body.b,
+            k : k,
+            pko : signed,
+            pubkey : publicKey
+        };
         request({
             url: 'http://localhost:3100/proofOfPubK',
             method: 'POST',
             body: message,
             json: true
-        }, function(error, response, body){
+        }, function (error, response, body) {
             if (error)
                 console.log("POST error");
-            else{
+            else {
 
             }
         });

@@ -38,14 +38,12 @@ app.post('/proofOfReception', function(req, res){
     const hash = pubKeyA.verify(po);
     console.log(hash);
 
-    const array = new Array(a, b, c);
-    const concat = array.join(',');
-    const hashCheck = nr.check(concat);
+    const array = [a, b, c];
+    const hashCheck = nr.check(array);
     console.log(hashCheck);
 
-    const array2 = new Array(b, a, c);
-    const concat2 = array2.join(',');
-    const signed = nr.proof(concat2, privateKey);
+    const array2 = [b, a, c];
+    const signed = nr.proof(array2, privateKey);
 
     let message = {};
     message.b = b;
