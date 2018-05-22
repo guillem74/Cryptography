@@ -33,20 +33,23 @@ app.post('/proofOfReception', function(req, res){
 
     c = req.body.c;
     const array = [req.body.a, req.body.b, c];
-    nr.check(bignum(req.body.po, 16), req.body.pubkey, array);
+    const check = nr.check(bignum(req.body.po, 16), req.body.pubkey, array);
+    if (check == false){
+        res.status(400).send("Error")
+    }
+    else{
+        const array2 = [req.body.b, req.body.a, c];
+        const signed = nr.proof(array2, privateKey);
 
+        let message = {
+            b : req.body.b,
+            a : req.body.a,
+            pr : signed,
+            pubKey : publicKey
+        };
 
-    const array2 = [req.body.b, req.body.a, c];
-    const signed = nr.proof(array2, privateKey);
-
-    let message = {
-        b : req.body.b,
-        a : req.body.a,
-        pr : signed,
-        pubKey : publicKey
-    };
-
-    res.status(200).send(message);
+        res.status(200).send(message);
+    }
 
 });
 

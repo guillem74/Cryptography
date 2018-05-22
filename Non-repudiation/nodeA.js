@@ -38,32 +38,37 @@ request({
     if (error)
         console.log("POST error");
     else {
-        const array = [body.a, body.b, body.c];
-        nr.check(bignum(body.pr, 16), body.pubKey, array);
+        const array = [body.b, body.a, c];
+        const check = nr.check(bignum(body.pr, 16), body.pubKey, array);
+        if (check == false){
+            console.log("There is an error")
+        }
+        else{
+            const pko = [a, ttp, b, k];
+            const signed = nr.proof(pko, privateKey);
+            let message = {
+                a : body.a,
+                ttp : ttp,
+                b : body.b,
+                k : k,
+                pko : signed,
+                pubkey : publicKey
+            };
+            request({
+                url: 'http://localhost:3100/proofOfPubK',
+                method: 'POST',
+                body: message,
+                json: true
+            }, function (error, response, body) {
+                if (error)
+                    console.log("POST error");
+                else {
 
-        const pko = [a, ttp, b, k];
-        const signed = nr.proof(pko, privateKey);
-        let message = {
-            a : body.a,
-            ttp : ttp,
-            b : body.b,
-            k : k,
-            pko : signed,
-            pubkey : publicKey
-        };
-        request({
-            url: 'http://localhost:3100/proofOfPubK',
-            method: 'POST',
-            body: message,
-            json: true
-        }, function (error, response, body) {
-            if (error)
-                console.log("POST error");
-            else {
+                }
+            });
 
-            }
-        });
+        }
+
 
     }
 });
-

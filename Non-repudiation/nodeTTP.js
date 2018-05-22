@@ -32,34 +32,39 @@ const {publicKey, privateKey} = rsa.generateRandomKeys(512);
 app.post('/proofOfPubK', function(req, res){
 
     const array = [req.body.a, req.body.ttp, req.body.b, req.body.k];
-    nr.check(bignum(req.body.pko, 16), req.body.pubkey, array);
+    const check = nr.check(bignum(req.body.pko, 16), req.body.pubkey, array);
+    if (check == false){
+        res.status(400).send("Error")
+    }
+    else{
 
+        const array2 = [req.body.ttp, req.body.a, req.body.b, req.body.k];
+        const pkp = nr.proof(array2, privateKey);
+        let message = {
+            ttp : req.body.ttp,
+            a : req.body.a,
+            b : req.body.b,
+            k : req.body.k,
+            pkp : pkp,
+            pubKey : publicKey
+        };
 
-    const array2 = [req.body.ttp, req.body.a, req.body.b, req.body.k];
-    const pkp = nr.proof(array2, privateKey);
-    let message = {
-        ttp : req.body.ttp,
-        a : req.body.a,
-        b : req.body.b,
-        k : req.body.k,
-        pkp : pkp,
-        pubKey : publicKey
-    };
+        res.status(200).send(message);
 
-    res.status(200).send(message);
+        request({
+            url: 'http://localhost:3000/checkK',
+            method: 'POST',
+            body: message,
+            json: true
+        }, function(error, response, body){
+            if (error)
+                console.log("POST error");
+            else{
 
-    request({
-        url: 'http://localhost:3000/checkK',
-        method: 'POST',
-        body: message,
-        json: true
-    }, function(error, response, body){
-        if (error)
-            console.log("POST error");
-        else{
+            }
+        });
+    }
 
-        }
-    });
 
 
 });
