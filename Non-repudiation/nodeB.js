@@ -30,34 +30,29 @@ let c;
 
 //Proof of reception
 app.post('/proofOfReception', function(req, res){
-    const a = req.body.a;
-    const b = req.body.b;
+
     c = req.body.c;
-    const po = bignum(req.body.po, 16);
-    const pubKeyA = rsa.publicKey(req.body.pubkey);
-    const hash = pubKeyA.verify(po);
-    console.log(hash);
+    const array = [req.body.a, req.body.b, c];
+    nr.check(bignum(req.body.po, 16), req.body.pubkey, array);
 
-    const array = [a, b, c];
-    const hashCheck = nr.check(array);
-    console.log(hashCheck);
 
-    const array2 = [b, a, c];
+    const array2 = [req.body.b, req.body.a, c];
     const signed = nr.proof(array2, privateKey);
 
-    let message = {};
-    message.b = b;
-    message.a = a;
-    message.pr = signed;
-    message.pubKey = publicKey;
+    let message = {
+        b : req.body.b,
+        a : req.body.a,
+        pr : signed,
+        pubKey : publicKey
+    };
 
     res.status(200).send(message);
 
 });
 
 app.post('/checkK', function(req, res){
-    const k = req.body.k;
 
+    const k = req.body.k;
     const decipher = crypto.createDecipher('aes256', k.toString(16));
     let mDecrypted = decipher.update(c, 'hex', 'utf8');
     mDecrypted += decipher.final('utf8');

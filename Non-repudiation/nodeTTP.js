@@ -30,31 +30,21 @@ const {publicKey, privateKey} = rsa.generateRandomKeys(512);
 
 //Proof of reception
 app.post('/proofOfPubK', function(req, res){
-    const a = req.body.a;
-    const ttp = req.body.ttp;
-    const b = req.body.b;
-    const k = req.body.k;
-    const pko = bignum(req.body.pko, 16);
-    console.log(k);
+
+    const array = [req.body.a, req.body.ttp, req.body.b, req.body.k];
+    nr.check(bignum(req.body.pko, 16), req.body.pubkey, array);
 
 
-    const pubKeyA = rsa.publicKey(req.body.pubkey);
-    const hash = pubKeyA.verify(pko);
-    console.log(hash);
-
-    const array = [a, ttp, b, k];
-    const hashCheck = nr.check(array);
-    console.log(hashCheck);
-
-    const array2 = [ttp, a, b, k];
+    const array2 = [req.body.ttp, req.body.a, req.body.b, req.body.k];
     const pkp = nr.proof(array2, privateKey);
-    let message = {};
-    message.ttp = ttp;
-    message.a = a;
-    message.b = b;
-    message.k = k;
-    message.pkp = pkp;
-    message.pubKey = publicKey;
+    let message = {
+        ttp : req.body.ttp,
+        a : req.body.a,
+        b : req.body.b,
+        k : req.body.k,
+        pkp : pkp,
+        pubKey : publicKey
+    };
 
     res.status(200).send(message);
 

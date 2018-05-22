@@ -28,13 +28,19 @@ const proof = function (array, key){
     return signed;
 };
 
-const check = function (array){
+const check = function (proof, key, array){
+
+    const pubKey = rsa.publicKey(key);
+    const check = pubKey.verify(proof);
 
     const concat = array.join(',');
     const hash = crypto.createHash('sha256').update(concat).digest('hex');
     const buff = Buffer.from(hash);
     const bn = bignum.fromBuffer(buff);
-    return bn;
+
+    console.log(check);
+    console.log(bn);
+
 };
 
 

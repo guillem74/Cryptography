@@ -13,7 +13,6 @@ const a = "A";
 const b = "B";
 const m = "This is the secret message";
 const ttp = "TTP";
-
 const k = "Symmetric key";
 const cipher = crypto.createCipher('aes256', k.toString(16));
 let c = cipher.update(m, 'utf8', 'hex');
@@ -22,12 +21,13 @@ c += cipher.final('hex');
 
 const array = [a, b, c];
 const signed = nr.proof(array, privateKey);
-let message = {};
-message.a = a;
-message.b = b;
-message.c = c;
-message.po = signed;
-message.pubkey = publicKey;
+let message = {
+    a : a,
+    b : b,
+    c : c,
+    po : signed,
+    pubkey : publicKey
+};
 
 request({
     url: 'http://localhost:3000/proofOfReception',
@@ -38,16 +38,8 @@ request({
     if (error)
         console.log("POST error");
     else {
-        const pr = bignum(body.pr, 16);
-        const a = body.a;
-        const b = body.b;
-        const pubKeyB = rsa.publicKey(body.pubKey);
-        const hash = pubKeyB.verify(pr);
-        console.log(hash);
-
-        const array = [a, b, c];
-        const hashCheck = nr.check(array);
-        console.log(hashCheck);
+        const array = [body.a, body.b, body.c];
+        nr.check(bignum(body.pr, 16), body.pubKey, array);
 
         const pko = [a, ttp, b, k];
         const signed = nr.proof(pko, privateKey);
