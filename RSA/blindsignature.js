@@ -23,8 +23,8 @@ request({
 
             //Obtain public parameters
             const res = JSON.parse(body);
-            const e = bignum(res.e);
-            const n = bignum(res.n);
+            const e = bignum(res.e,16);
+            const n = bignum(res.n,16);
 
             let r = n.rand();
             while (r.gcd(n)!=1){
@@ -49,7 +49,7 @@ request({
                 if (error)
                     console.log("POST error");
                 else {
-                    const res = bignum(body.s);
+                    const res = bignum(body.s,16);
                     //Compute sigma = sigma' * r^-1 * mod(n)
                     const sigma = (res.mul(rInv)).mod(n);
                     // Compute sigma^e mod (n)

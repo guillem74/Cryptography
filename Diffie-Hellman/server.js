@@ -21,27 +21,30 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+const p = dh.DH.getDHParams();
+const param = new dh.DH(p, 2);
 
-const parameters = dh.AliceParameters();
 
 app.get('/key', function (req,res){
 
-	res.status(200).send(parameters)
+	res.status(200).send(param)
 
 });
 
 app.post('/message', function(req, res){
 
-	const B = bigInt(req.body.B);
+
+	const B = bigInt(req.body.B, 16);
 	const mEncrypted = req.body.message;
 	let mDecrypted;
 
+	const iv = Buffer.from(req.body.iv);
 	//Generate the key
-	const key = dh.dhKeyAlice(B, parameters.a, parameters.p);
-	const iv = req.body.iv;
+	const dhKey = param.sharedKey(B);
+	const key = Buffer.from(dhKey.toString(16), 'hex').slice(0, 32);
 
 	//Decrypt message
-	const decipher = crypto.createDecipher('aes256', key.toString(16), iv);
+	let decipher = crypto.createDecipheriv('aes256', key, iv);
 	mDecrypted = decipher.update(mEncrypted, 'hex', 'utf8');
 	mDecrypted += decipher.final('utf8');
 

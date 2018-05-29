@@ -3,23 +3,24 @@
 const bignum = require('bignum');
 
 /*
-    n - Number of total keys
-    t - Keys needed to recover secret
-    secret - Secret
-    bits - Number of bits of p. Default 1024
+
+   t - Keys needed to recover secret
+   n - Number of total keys
+   secret - Secret
+   bits - Number of bits of p. Default 1024
  */
 const share = function (t, n, secret, bits = 1024) {
     let keys = [];
     const degree = t - 1;
     let polCoef = [];
-    //convert secret to
+    //secret to bignum
     const s = bignum(secret);
-    //position 0 of the polinomy array is the secret
+    //Position 0 of the polinomy array is the secret
     polCoef.push(s);
-    //generate prime p with lenght bits
+    //Generate prime p with length bits
     const p = bignum.prime(bits);
 
-    //generate rand coeficients of the plinomy
+    //Generate rand coeficients of the polinomy
     for (let j = 0; j < degree; j++) {
         polCoef.push(s.rand());
     }
@@ -87,7 +88,7 @@ const combine = function (keys = []) {
         return z;
     });
 
-    const secret = sTemp.mod(p).toString(10)
+    const secret = sTemp.mod(p).toString(10);
     return secret
 };
 

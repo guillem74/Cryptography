@@ -7,6 +7,7 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
+const rsa = require('./rsa');
 const app = express();
 
 app.set('views', path.join(__dirname, 'views'));
@@ -19,35 +20,24 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-//Generate p, q
-const p = bignum.prime(1024, true);
-const q = bignum.prime(1024, true);
 
-//Public parameters
-const n = p.mul(q);
-const e = bignum(65537);
+const { publicKey, privateKey } = rsa.generateRandomKeys(512);
 
-//Private parameters
-const phi = (p.sub(1)).mul(q.sub(1));
-const d = e.invertm(phi);
+
 
 //Send public keys
 app.get('/publicKeys', function(req,res){
-
-    let response = {};
-    response.e = e.toString();
-    response.n = n.toString();
-    res.status(200).send(response);
+    res.status(200).send(publicKey);
 });
 
 //Receive crypted message and decrypt using private keys
 app.post('/decrypt', function(req, res){
-
-    let c = bignum(req.body.c);
+    let c = bignum(req.body.c, 16);
+    console.log(c);
     res.status(200).send("Correct");
-    let m = c.powm(d, n);
-    const msg = m.toBuffer().toString();
-    console.log(msg);
+    const msg = privateKey.decrypt(c);
+    const msg2 = msg.toBuffer().toString();
+    console.log(msg2);
 });
 
 //Receive m' and compute sigma'
@@ -55,7 +45,7 @@ app.post('/blindSignature', function(req,res){
 
     const mPrime = bignum(req.body.m);
     //sigma' = m'^d mod(n)
-    const sigmaPrime = mPrime.powm(d, n);
+    const sigmaPrime = privateKey.sign(mPrime);
     let response = {};
     response.s = sigmaPrime.toString();
     res.status(200).send(response);

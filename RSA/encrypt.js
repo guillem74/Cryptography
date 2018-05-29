@@ -2,11 +2,15 @@
 
 const request = require('request');
 const bignum = require('bignum');
+const rsa = require('./rsa');
+
 
 
 const msg = "Esto esta encriptado";
 const buff = Buffer.from(msg);
 const m = bignum.fromBuffer(buff);
+
+let pubKey;
 
 request({
         uri: 'http://localhost:3000/publicKeys',
@@ -23,13 +27,12 @@ request({
         else{
             let r = JSON.parse(body);
             //Receive public keys
-            let e = bignum(r.e);
-            let n = bignum(r.n);
+
+            pubKey = rsa.publicKey(r);
+            //public key obtained
+            let c = pubKey.encrypt(m);
             let message = {};
-            //Encrypt message c = m^eMod(n) with public keys
-            let c = m.powm(e, n);
-            message.c = c.toString();
-            //Send the encrypted message
+            message.c = c;
             request({
                 url: 'http://localhost:3000/decrypt',
                 method: 'POST',
